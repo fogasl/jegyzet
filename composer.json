@@ -1,0 +1,25 @@
+{
+    "name": "fogasl/jegyzet",
+    "description": "Notetaking web application",
+    "version": "0.1.0",
+    "type": "project",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "fogasl",
+            "email": "dev@fogaslaszlo.hu"
+        }
+    ],
+    "require": {
+        "smarty/smarty": "^4.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "phpdocumentor/phpdocumentor": "^3.3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "FLDSoftware\\": "src/FLDSoftware"
+        }
+    }
+}

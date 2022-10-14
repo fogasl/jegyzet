@@ -1,0 +1,3 @@
+Entities are plain PHP classes with their real and virtual properties.
+Entities does not define data validation mechanisms, this is done on the Model
+level.

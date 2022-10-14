@@ -1,6 +1,6 @@
-assets/*
-!assets/.gitignore
-protected/runtime/*
-!protected/runtime/.gitignore
-protected/data/*.db
-themes/classic/views/
+.vs/
+.vscode/
+.idea/
+vendor/
+docs/cache
+cache/
