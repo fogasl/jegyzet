@@ -63,7 +63,7 @@ class AppData {
         if (!($path->exists())) {
             throw new Pathlib\PathException(
                 \sprintf(
-                    "Cannot %s: file does not exist",
+                    "Cannot open %s: file does not exist",
                     $path
                 )
             );

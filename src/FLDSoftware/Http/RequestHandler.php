@@ -41,13 +41,13 @@ class RequestHandler extends Loggable {
      * Array of request body parser instances for various content type payloads.
      * @var \FLDSoftware\Http\Parsers\BodyParserBase[]
      */
-    protected $bodyParsers;
+    protected array $bodyParsers;
 
     /**
      * Array of cookie parser instances.
      * @var \FLDSoftware\Http\Parsers\CookieParserBase[]
      */
-    protected $cookieParsers;
+    protected array $cookieParsers;
 
     /**
      * Handle errors during cookie parsing.
@@ -82,7 +82,7 @@ class RequestHandler extends Loggable {
     }
 
     /**
-     * Handle errors when the response handler is unable to handle a particular
+     * Handle errors when the request handler is unable to handle a particular
      * HTTP method.
      * Allowed methods are listed in the
      * {@see \FLDSoftware\Http\RequestHandler::ALLOWED_METHODS} constant.
@@ -129,8 +129,10 @@ class RequestHandler extends Loggable {
 
             if (!$handled) {
                 $this->logWarning(
-                    "No request body parser found for: %s",
-                    $request
+                    "%s %s No request body parser found for %s",
+                    $request->method,
+                    $request->path,
+                    $request->headers->contentType
                 );
             }
         }

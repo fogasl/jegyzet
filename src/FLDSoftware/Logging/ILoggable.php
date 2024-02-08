@@ -12,6 +12,7 @@ interface ILoggable {
      * @param int $level Log message level (severity)
      * @param string $message Log message. Format string also supported.
      * @param mixed ...$args Arguments to format the message with.
+     * @return \FLDSoftware\Logging\ILoggable For method chaining
      */
     public function log(int $level, string $message, ...$args);
 

@@ -1,0 +1,6 @@
+Models
+- encapsulate *entities* (a single entity for simple and multiple entities for composite data structures)
+- contains *table name(s)* to maps entities to database tables (what about NoSQL?)
+- contains data validation schemes and related logic
+- contains change tracking mechanism (for atomic updates)
+- define access scenarios and permission models (?)

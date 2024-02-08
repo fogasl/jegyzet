@@ -6,7 +6,7 @@ namespace FLDSoftware\Http;
  * Represents an HTTP cookie with their properties.
  * Cookies are in the header of HTTP requests.
  */
-class Cookie {
+class Cookie implements \Stringable {
 
     /**
      * Default value for cookie domain.
@@ -92,13 +92,39 @@ class Cookie {
         $this->httpOnly = $httpOnly;
     }
 
-    public function __toString() {
-        return $this->name;
+    public function getValue() {
+        // FIXME urldecode raw value or process as required by the standard
+        throw new \Exception("Not Implemented");
     }
 
-    // FIXME: not used yet
-    public static function fromHeader($header) {
-        return new Cookie();
+    public function setDomain(string $domain) {
+        // FIXME
+    }
+
+    public function setPath(string $path) {
+        // FIXME
+    }
+
+    public function setExpiration(\DateTimeInterface $expiration) {
+        // FIXME
+        $this->expires = $expiration->getTimestamp();
+    }
+
+    /**
+     * Returns string representation of the cookie.
+     * @return string
+     */
+    public function __toString(): string {
+        // FIXME return HTTP header compliant version!
+        return \sprintf(
+            "Set-Cookie: %s=%s",
+            $this->name,
+            $this->value
+        );
+    }
+
+    public static function fromServer(string $key, string $value, string $options = ""): self {
+        throw new \Exception("Not Implemented");
     }
 
 }

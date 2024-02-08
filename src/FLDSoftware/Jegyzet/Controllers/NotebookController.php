@@ -3,7 +3,6 @@
 namespace FLDSoftware\Jegyzet\Controllers;
 
 use FLDSoftware\Http;
-use FLDSoftware\WebApp\Controllers\ControllerBase;
 
 class NotebookController extends JegyzetControllerBase {
 
@@ -14,7 +13,7 @@ class NotebookController extends JegyzetControllerBase {
     public function urls() {
         return array(
             array("GET", "/notebooks", "getNotebooks"),
-            array("GET", "/notebook/:id", "getNotebook"),
+            array("GET", "/notebook/{id}", "getNotebook"),
 
             // Update notebook
             array("POST", "/notebook", "postNotebook"),

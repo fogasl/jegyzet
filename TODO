@@ -1,0 +1,34 @@
+0. Generic
+
+[] Private and protected properties MUST follow the $_name convention
+
+1. HTTP layer
+
+[] Request class - typed variables
+[] Request class - initialize reference types in default ctor
+[] Request class - Comments on all properties and methods
+[] HeaderContainer - what about additional properties, e.g. charset, allow? (related: Header::getValues())
+[] Header class - implement additional static ctors for common headers (collect them from MDN)
+[] Create JSON and signed cookie parser classes
+[] Remove parseToClass() from body, cookie and URL(?) parsers since this functionality will be handled on a higher level and on-demand
+[] RequestHandler class - rationalize pass-by-reference signatures, use only is necessary
+[] RequestHandler class - ?
+[] WebApplicationBase class - typed variables
+[] WebApplicationBase class - initialize reference types in default ctor
+[] WebApplicationBase::mount() - Check $controller::authentication(), $controller::urls(), $controller::validation()
+[] RequestDispatcher::dispatch() - Controller methods SHOULD NOT return ResponseHandler instances, use pass-by-reference (!!!)
+[] RequestDispatcher::dispatch() - Extract to smaller functions (to be overridable and testable)
+[] WebApplicationBase class - Must implement a method that handles authentication and request/response validation (pre and post call)
+[] WebApplicationBase::handleRequest() - BEFORE calling RequestDispatcher::dispatch() use methods mentioned in the previous point
+[] WebApplicationBase::handleRequest() - debug logging?
+[] WebApplicationBase class - implement authentication checking function
+[] WebApplicationBase class - implement request/response validation function
+[x] Response class - Static ctors for common response types (200, 301, 400, 404, 500)
+[] ResponseHandler class - typed variables
+[] ResponseHandler class - implement method stubs
+[] ResponseHandler class - where applicable, use content streaming
+[] ResponseHandler::sendFile() - automatic determination of file MIME type by extension
+
+2. Database
+
+[]

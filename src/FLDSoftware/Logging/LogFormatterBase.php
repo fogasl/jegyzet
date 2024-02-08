@@ -2,6 +2,9 @@
 
 namespace FLDSoftware\Logging;
 
+/**
+ * Base class for log message formatters.
+ */
 class LogFormatterBase {
 
     /**
@@ -20,13 +23,13 @@ class LogFormatterBase {
      * The adjusted log message format string.
      * @var string
      */
-    protected $formatString;
+    protected string $_formatString;
 
     /**
      * The adjusted date format string.
      * @var string
      */
-    protected $dateFormatString;
+    protected string $_dateFormatString;
 
     /**
      * Get log message level name.
@@ -51,6 +54,9 @@ class LogFormatterBase {
         elseif ($level & LoggerBase::LOG_LEVEL_MINOR) {
             $res = "MINOR";
         }
+        elseif ($level & LoggerBase::LOG_LEVEL_INFO) {
+            $res = "INFO";
+        }
         elseif ($level & LoggerBase::LOG_LEVEL_DEBUG) {
             $res = "DEBUG";
         }
@@ -70,22 +76,22 @@ class LogFormatterBase {
      * @param string $dateFormatString Date format string.
      */
     public function __construct(string $formatString = self::DEFAULT_FORMAT, string $dateFormatString = self::DEFAULT_DATE_FORMAT) {
-        $this->formatString = $formatString;
-        $this->dateFormatString = $dateFormatString;
+        $this->_formatString = $formatString;
+        $this->_dateFormatString = $dateFormatString;
     }
 
     /**
      * Format the log message.
      * @param int $level Level (severity) of the log message
-     * @param \DateTime $date Date of the log message
+     * @param \DateTimeInterface $date Date of the log message
      * @param string $message Log message
      * @param mixed ...$args Arguments to format the message with
      * @return string Formatted log message.
      */
-    public function format(int $level, \DateTime $date, string $message, ...$args) {
+    public function format(int $level, \DateTimeInterface $date, string $message, ...$args) {
         return \sprintf(
-            $this->formatString,
-            $date->format($this->dateFormatString),
+            $this->_formatString,
+            $date->format($this->_dateFormatString),
             self::getLevelName($level),
             \sprintf(
                 $message,

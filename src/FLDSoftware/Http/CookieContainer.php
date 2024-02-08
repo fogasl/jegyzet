@@ -16,4 +16,6 @@ class CookieContainer extends GenericKeyValueContainer {
         parent::__construct(Cookie::class);
     }
 
+    // FIXME
+
 }

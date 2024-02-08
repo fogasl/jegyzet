@@ -11,7 +11,7 @@ abstract class Loggable implements ILoggable {
      * Reference to the logger instance.
      * @var \FLDSoftware\Logging\LoggerBase
      */
-    protected $logger;
+    protected LoggerBase $_logger;
 
     /**
      * Low-level logging function.
@@ -22,72 +22,91 @@ abstract class Loggable implements ILoggable {
      * @return \FLDSoftware\Logging\Loggable For method chaining
      */
     public function log(int $level, string $message, ...$args) {
-        if ($this->logger !== null) {
-            $this->logger->log($level, $message, ...$args);
+        if ($this->_logger !== null) {
+            $this->_logger->log($level, $message, ...$args);
         }
+
+        return $this;
     }
 
     /**
      * Log message with "CRITICAL" severity.
      * @param string $message Message to log. Format string is allowed.
      * @param ...$args Arguments to format the message with.
+     * @return \FLDSoftware\Logging\Loggable For method chaining
      */
     public function logCritical(string $message, ...$args) {
-        $this->log(LoggerBase::LOG_LEVEL_CRITICAL, $message, ...$args);
+        return $this->log(LoggerBase::LOG_LEVEL_CRITICAL, $message, ...$args);
     }
 
     /**
      * Log message with "ERROR" severity.
      * @param string $message Message to log. Format string is allowed.
      * @param ...$args Arguments to format the message with.
+     * @return \FLDSoftware\Logging\Loggable For method chaining
      */
     public function logError(string $message, ...$args) {
-        $this->log(LoggerBase::LOG_LEVEL_ERROR, $message, ...$args);
+        return $this->log(LoggerBase::LOG_LEVEL_ERROR, $message, ...$args);
     }
 
     /**
      * Log message with "WARNING" severity.
      * @param string $message Message to log. Format string is allowed.
      * @param ...$args Arguments to format the message with.
+     * @return \FLDSoftware\Logging\Loggable For method chaining
      */
     public function logWarning(string $message, ...$args) {
-        $this->log(LoggerBase::LOG_LEVEL_WARNING, $message, ...$args);
+        return $this->log(LoggerBase::LOG_LEVEL_WARNING, $message, ...$args);
     }
 
     /**
      * Log message with "MAJOR" severity.
      * @param string $message Message to log. Format string is allowed.
      * @param ...$args Arguments to format the message with.
+     * @return \FLDSoftware\Logging\Loggable For method chaining
      */
     public function logMajor(string $message, ...$args) {
-        $this->log(LoggerBase::LOG_LEVEL_MAJOR, $message, ...$args);
+        return $this->log(LoggerBase::LOG_LEVEL_MAJOR, $message, ...$args);
     }
 
     /**
      * Log message with "MINOR" severity.
      * @param string $message Message to log. Format string is allowed.
      * @param ...$args Arguments to format the message with.
+     * @return \FLDSoftware\Logging\Loggable For method chaining
      */
     public function logMinor(string $message, ...$args) {
-        $this->log(LoggerBase::LOG_LEVEL_MINOR, $message, ...$args);
+        return $this->log(LoggerBase::LOG_LEVEL_MINOR, $message, ...$args);
+    }
+
+    /**
+     * Log message with "INFO" severity.
+     * @param string $message Message to log. Format string is allowed.
+     * @param ...$args Arguments to format the message with.
+     * @return \FLDSoftware\Logging\Loggable For method chaining
+     */
+    public function logInfo(string $message, ...$args) {
+        return $this->log(LoggerBase::LOG_LEVEL_INFO, $message, ...$args);
     }
 
     /**
      * Log message with "DEBUG" severity.
      * @param string $message Message to log. Format string is allowed.
      * @param ...$args Arguments to format the message with.
+     * @return \FLDSoftware\Logging\Loggable For method chaining
      */
     public function logDebug(string $message, ...$args) {
-        $this->log(LoggerBase::LOG_LEVEL_DEBUG, $message, ...$args);
+        return $this->log(LoggerBase::LOG_LEVEL_DEBUG, $message, ...$args);
     }
 
     /**
      * Log message with "TRACE" severity.
      * @param string $message Message to log. Format string is allowed.
      * @param ...$args Arguments to format the message with.
+     * @return \FLDSoftware\Logging\Loggable For method chaining
      */
     public function logTrace(string $message, ...$args) {
-        $this->log(LoggerBase::LOG_LEVEL_TRACE, $message, ...$args);
+        return $this->log(LoggerBase::LOG_LEVEL_TRACE, $message, ...$args);
     }
 
     /**
@@ -95,7 +114,7 @@ abstract class Loggable implements ILoggable {
      * @return \FLDSoftware\Logging\LoggerBase
      */
     public function getLogger() {
-        return $this->logger;
+        return $this->_logger;
     }
 
     /**
@@ -103,7 +122,7 @@ abstract class Loggable implements ILoggable {
      * @param \FLDSoftware\Logging\LoggerBase $logger Logger instance to set
      */
     public function setLogger(LoggerBase $logger) {
-        $this->logger = $logger;
+        $this->_logger = $logger;
     }
 
 }

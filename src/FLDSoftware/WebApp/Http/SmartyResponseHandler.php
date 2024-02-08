@@ -39,14 +39,16 @@ class SmartyResponseHandler extends ResponseHandler {
     }
 
     public function smarty(string $template, $data) {
-        // FIXME: these should come from middlewares!
+        // FIXME: these should come from `View` instances!
         $this->smarty->assign("appData", $this->context->appData);
         $this->smarty->assign("appConfig", $this->context->config);
 
         $this->smarty->assign("data", $data);
 
+        // Render template
         $content = $this->smarty->fetch($template);
 
+        // Set as response body
         $this->response->setBody(
             $content
         );

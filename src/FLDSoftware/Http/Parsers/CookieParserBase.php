@@ -21,7 +21,7 @@ class CookieParserBase extends Loggable {
      * Parses the cookies and returns
      * {@see \FLDSoftware\Http\CookieContainer} object.
      * @param array $server raw HTTP request data from `$_SERVER`
-     * @param \FLDSoftware\Http\Request $request 
+     * @param \FLDSoftware\Http\Request $request
      * @return \FLDSoftware\Http\CookieContainer Cookie container instance.
      * @throws \FLDSoftware\Http\Errors\CookieParsingException
      * In case of failure of any kind.
@@ -35,16 +35,17 @@ class CookieParserBase extends Loggable {
                 $cookie = \explode("=", $piece);
                 $key = \trim($cookie[0]);
                 $val = \trim($cookie[1]);
-    
+
+                // FIXME parameter extraction MUST use Cookie::fromServer()
                 $res->setItem(
                     $key,
                     new Http\Cookie($key, $val)
                 );
             }
-    
+
             // Attach parsed cookies to the request instance.
             $request->cookies = $res;
-            
+
             return $res;
         } catch (\Throwable $err) {
             throw new Http\Errors\CookieParsingException(

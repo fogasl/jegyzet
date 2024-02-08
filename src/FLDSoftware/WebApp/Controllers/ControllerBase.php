@@ -10,10 +10,6 @@ use FLDSoftware\WebApp\WebApplicationBase;
  */
 abstract class ControllerBase extends Loggable {
 
-    const MW_BEFORE = 1;
-
-    const MW_AFTER = 2;
-
     /**
      * Reference to the enclosing web application instance.
      * @var \FLDSoftware\WebApp\WebApplicationBase

@@ -12,7 +12,9 @@ use FLDSoftware\WebApp\Http\RequestDispatcher;
 /**
  * Base class for applications.
  */
-class WebApplicationBase extends Loggable {
+class WebApplicationBase extends Loggable implements \Stringable {
+
+    const DEFAULT_AUTH_STRATEGY = "default";
 
     /**
      * Application descriptor data container.
@@ -21,7 +23,7 @@ class WebApplicationBase extends Loggable {
     public $appData;
 
     /**
-     * Mapping URLs to Controller instances.
+     * Mapping URLs to Controller::handler() instances.
      * @var array
      */
     public $urlMap;
@@ -51,6 +53,12 @@ class WebApplicationBase extends Loggable {
     public $requestDispatcher;
 
     /**
+     * Associative array containing authentication strategy names and instances.
+     * @var array
+     */
+    protected array $authStrategies;
+
+    /**
      * Initialize the application.
      * @param \FLDSoftware\WebApp\Config\AppData $appData Application descriptor data such as app name and so.
      * @param \FLDSoftware\Config\ConfigBase $config Application configuration.
@@ -59,6 +67,7 @@ class WebApplicationBase extends Loggable {
         $this->appData = $appData;
         $this->config = $config;
         $this->urlMap = array();
+        $this->authStrategies = array();
     }
 
     /**
@@ -96,10 +105,12 @@ class WebApplicationBase extends Loggable {
         $controller = new $controllerClass($context);
 
         // Set logging
-        $controller->setLogger($this->logger);
+        $controller->setLogger($this->_logger);
 
         // Retrieve mount points
         $urls = $controller->urls();
+
+        // FIXME: retrieve authentication rules
 
         // Store mount points and options
         foreach ($urls as $url) {
@@ -129,6 +140,27 @@ class WebApplicationBase extends Loggable {
 
         return $this;
     }
+
+    // FIXME add event handlers:
+    // beforeRequest() - at the beginning of ::handleRequest()
+    // beforeDispatch() - at the beginning of ::dispatch() (logging in between)
+    // beforeDestinationFound() - Before trying to identify controller and method
+    // afterDestinationFound() - After controller and method found OR exception thrown
+    // beforeControllerCalled() - May handle authentication in this phase
+    // afterControllerCalled() - controller method finished and returned a response
+    // afterDispatch() - at the end of ::dispatch() (logging in between)
+    // beforeError() - at the beginning of catch (\Throwable $err)
+    // afterError()
+    // beforeSendStatus()
+    // afterSendStatus()
+    // beforeSendHeaders()
+    // afterSendHeaders()
+    // beforeSendCookies()
+    // afterSendCookies()
+    // beforeSendBody()
+    // afterSendBody()
+    // afterRequest() - at the end of ::handleRequest() - request and response data is read-only!
+    // Subclasses may override these methods...
 
     /**
      * Perform the complete HTTP request cycle handling.
@@ -167,7 +199,7 @@ class WebApplicationBase extends Loggable {
             // Send HTTP status header to the client
             $responseHandler->sendStatus();
 
-            // Send HTTP headers
+            // Send HTTP headers (except cookies)
             $responseHandler->sendHeaders();
 
             // Send cookies
@@ -180,7 +212,7 @@ class WebApplicationBase extends Loggable {
 
     /**
      * Handle unexpected errors in the request handling phase.
-     * Subclasses may overload this method to implement their own error
+     * Subclasses may override this method to implement their own error
      * handling mechanisms.
      * @param \Throwable $exception
      * @param \FLDSoftware\Http\Request $request
@@ -204,17 +236,28 @@ class WebApplicationBase extends Loggable {
         return $handler;
     }
 
+    public function setAuthStrategy(string $name, mixed $instance): WebApplicationBase {
+        $this->authStrategies[$name] = $instance;
+        return $this;
+    }
+
+    public function setDefaultAuthStrategy(mixed $instance): WebApplicationBase {
+        $this->authStrategies[self::DEFAULT_AUTH_STRATEGY] = $instance;
+        return $this;
+    }
+
     /**
      * Perform web application setup.
      * In this implementation, basic `RequestHandler`, `RequestDispatcher` and
      * `ResponseHandler` instances are attached.
-     * Subclasses may (and should) overload this method to implement their own
+     * Subclasses may (and should) override this method to implement their own
      * HTTP cycle handling and output rendering mechanisms.
      */
     public function setup() {
         $this->requestHandler = new Http\RequestHandler();
         $this->requestDispatcher = new RequestDispatcher($this);
         $this->responseHandler = new Http\ResponseHandler($this);
+        $this->requestAuthenticator = new Http\RequestAuthenticator($this);
     }
 
 }

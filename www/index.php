@@ -15,6 +15,6 @@ try {
     $app->handleRequest(
         $_SERVER
     );
-} catch (Exception $ex) {
+} catch (\Exception $ex) {
     $app->handleError($ex);
 }

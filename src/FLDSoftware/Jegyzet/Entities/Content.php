@@ -7,4 +7,12 @@ namespace FLDSoftware\Jegyzet\Entities;
  */
 class Content {
 
+    public string $contentType;
+
+    public string $content;
+
+    public function __toString(): string {
+        return $this->content;
+    }
+
 }

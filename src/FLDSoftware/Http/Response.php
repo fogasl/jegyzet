@@ -2,7 +2,12 @@
 
 namespace FLDSoftware\Http;
 
-class Response {
+use FLDSoftware\Collections\CollectionException;
+
+/**
+ * HTTP response.
+ */
+class Response implements \Stringable {
 
     /**
      * HTTP status codes and textual explanations.
@@ -28,7 +33,7 @@ class Response {
         226 => "IM Used",
 
         // 300 - Redirection messages
-        300 => "Multiple Choice",
+        300 => "Multiple Choices",
         301 => "Moved Permanently",
         302 => "Found",
         303 => "See Other",
@@ -82,6 +87,7 @@ class Response {
 
     /**
      * Default HTTP protocol version.
+     * TODO: include in documentation that app supports HTTP/1.1 only!
      */
     const DEFAULT_PROTOCOL = "HTTP/1.1";
 
@@ -94,49 +100,84 @@ class Response {
      * HTTP protocol version.
      * @var string
      */
-    protected $protocol;
+    protected string $_protocol;
 
     /**
      * HTTP status code of the response.
      * @var int
      */
-    protected $status;
+    protected int $_status;
+
+    /**
+     * Textual representation of the HTTP response status code.
+     * @var string
+     */
+    protected string $_reason;
 
     /**
      * Response headers.
      * @var HeaderContainer
      */
-    protected $headers;
+    protected HeaderContainer $_headers;
 
     /**
      * Response cookies.
      * @var CookieContainer
      */
-    protected $cookies;
+    protected CookieContainer $_cookies;
+
+    /**
+     * Ephemeral data.
+     * @var array<string, mixed>
+     */
+    protected array $_flash;
 
     /**
      * Response body.
      * @var string
      */
-    protected $body;
+    protected string $_body;
 
     /**
-     * @var \Throwable
+     * Error catched during request processing.
+     * @var \Throwable|null
      */
-    protected $error;
+    protected \Throwable|null $_error;
 
-    public function __construct($status = self::DEFAULT_STATUS, $protocol = self::DEFAULT_PROTOCOL) {
-        $this->protocol = $protocol;
-        $this->headers = new HeaderContainer();
-        $this->cookies = new CookieContainer();
+    /**
+     * The HTTP request that initiated the response.
+     * @var \FLDSoftware\Http\Request|null
+     */
+    protected Request|null $_request;
+
+    /**
+     * Initializes a Response instance with default HTTP status and empty body.
+     * @param int $status HTTP status code, see {@see \FLDSoftware\Http\Response::STATUS_CODES}
+     * @param string $body HTTP response body
+     * @param \FLDSoftware\Http\Request|null $request HTTP request instance that
+     * originated the response
+     */
+    public function __construct($status = self::DEFAULT_STATUS, string $body = "", Request|null $request = null) {
         $this->setStatus($status);
+        $this->_protocol = self::DEFAULT_PROTOCOL;
+        $this->_headers = new HeaderContainer();
+        $this->_cookies = new CookieContainer();
+        $this->_flash = array();
+        $this->_body = $body;
+
+        $this->_error = null;
+        $this->_request = $request;
     }
 
+    /**
+     * Returns a string that represents the HTTP response.
+     * @return string
+     */
     public function __toString() {
         return implode(" ", array(
-            $this->protocol,
-            $this->status,
-            self::STATUS_CODES[$this->status]
+            $this->_protocol,
+            $this->_status,
+            $this->_reason
         ));
     }
 
@@ -145,54 +186,142 @@ class Response {
      * @return int
      */
     public function getStatus() {
-        return $this->status;
+        return $this->_status;
     }
 
     public function setStatus($status) {
         if (!\array_key_exists($status, self::STATUS_CODES)) {
             throw new \Exception(
-                "Status code is not implemented: " . $status
+                "Status code is not supported: " . $status
             );
         }
 
-        $this->status = $status;
+        $this->_status = $status;
+        $this->_reason = self::STATUS_CODES[$status];
+    }
+
+    public function getReason() {
+        return self::STATUS_CODES[$this->_status];
     }
 
     public function getHeaders() {
-        return $this->headers->getItems();
+        return $this->_headers->getItems();
     }
 
     public function getHeader($name) {
-        return $this->headers->getItem($name);
+        return $this->_headers->getItem($name);
     }
 
-    public function setHeader($name, $value) {
-        $this->headers->add(
+    public function setHeader(string $name, string $value) {
+        $this->_headers->add(
             new Header($name, $value)
         );
     }
 
-    public function setCookie(Cookie $cookie) {
-        // FIXME
+    public function getCookies() {
+        return $this->_cookies;
     }
 
-    public function unsetCookie($name) {
+    public function getCookie(string $name) {
+        $res = null;
+
+        try {
+            $res = $this->_cookies->getItem($name);
+        } catch (\Exception) {
+
+        }
+
+        return $res;
+    }
+
+    // FIXME inconsistent parameterization with self::setHeader, containers
+    // must have the same, maybe add convenience methods
+    public function setCookie(Cookie $cookie): self {
         // FIXME
+        $this->_cookies->setItem($cookie->name, $cookie);
+        return $this;
+    }
+
+    public function unsetCookie($name): self {
+        try {
+            $cookie = $this->_cookies->getItem($name);
+
+            // FIXME
+            $cookie->setExpiration(0);
+
+            // Rewrite cookie
+            $this->_cookies->setItem($name, $cookie);
+        } catch (CollectionException) {
+            // TODO logging?
+        }
+
+        return $this;
+    }
+
+    // Gets all emhemeral data
+    public function getFlash() {
+        return $this->_flash;
+    }
+
+    // Gets a prticular ephemeral data by key
+    public function getFlashItem(string $key) {
+        $res = null;
+
+        // Must be fail-safe on non-existing items
+        try {
+            $res = $this->_flash[$key];
+        } catch (\Exception) {
+
+        }
+
+        return $res;
+    }
+
+    public function setFlashItem(string $key, mixed $value) {
+        $this->_flash[$key] = $value;
     }
 
     public function getBody() {
-        return $this->body;
+        return $this->_body;
     }
 
     public function setBody(string $body) {
-        $this->body = $body;
+        $this->_body = $body;
     }
 
     public function getError() {
-        return $this->error;
+        return $this->_error;
     }
 
     public function setError(\Throwable $error) {
-        $this->error = $error;
+        $this->_error = $error;
+    }
+
+    public function getRequest() {
+        return $this->_request;
+    }
+
+    public function setRequest(Request|null $request) {
+        $this->_request = $request;
+    }
+
+    public static function ok(string $body = ""): self {
+        return new self(200, $body);
+    }
+
+    public static function movedPermanently(): self {
+        return new self(301);
+    }
+
+    public static function badRequest(string $body = ""): self {
+        return new self(400, $body);
+    }
+
+    public static function notFound(string $body =""): self {
+        return new self(404, $body);
+    }
+
+    public static function internalServerError(string $body = ""): self {
+        return new self(500, $body);
     }
 }

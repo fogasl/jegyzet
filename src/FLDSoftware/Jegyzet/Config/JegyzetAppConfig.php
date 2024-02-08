@@ -22,6 +22,20 @@ class JegyzetAppConfig extends ConfigBase {
         $baseDir = new Path($componentDir, "..", "..", "..");
         $cacheDir = new Path($baseDir, "cache");
 
+        // TODO may use env vars instead, in the following fashion:
+        // JEGYZET_BASE_URL = ""
+        // JEGYZET_DEBUG = false
+        // JEGYZET_SMARTY_TEMPLATE_DIR = ""
+        // JEGYZET_SMARTY_COMPILE_DIR = ""
+        // JEGYZET_SMARTY_CACHE_DIR = ""
+        // JEGYZET_SMARTY_CONFIG_DIR = ""
+        // JEGYZET_EMAIL_ENABLED = 0
+        // JEGYZET_EMAIL_SMTP_HOST = "mail.mymta.local"
+        // JEGYZET_EMAIL_SMTP_PORT = "25"
+        // JEGYZET_EMAIL_SMTP_TLS = "STARTTLS" ???
+        // JEGYZET_EMAIL_SMTP_USER = "mailer"
+        // JEGYZET_EMAIL_SMTP_PASSWORD = "foobarbaz"
+
         $defaults = array(
             "baseUrl" => "",
 

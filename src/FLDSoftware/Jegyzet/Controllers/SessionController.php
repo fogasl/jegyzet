@@ -2,13 +2,16 @@
 
 namespace FLDSoftware\Jegyzet\Controllers;
 
-use FLDSoftware\Http;
+use FLDSoftware\Http\Request;
+use FLDSoftware\Http\ResponseHandler;
 use FLDSoftware\WebApp\WebApplicationBase;
 
 /**
  * Handling sign-in and sign-out operations.
  */
 class SessionController extends JegyzetControllerBase {
+
+    const SESSION_COOKIE_NAME = "jgysession";
 
     public function __construct(WebApplicationBase $context = null) {
         parent::__construct($context);
@@ -45,40 +48,38 @@ class SessionController extends JegyzetControllerBase {
      * @return array
      */
     public function authentication() {
+        // FIXME figure out reasonable parameterizing
         return array(
             "getIndex" => "WebAppAuthentication::basicHttp(foo, bar)"
         );
     }
 
-    public function getIndex(Http\Request $request, Http\ResponseHandler $handler) {
+    // GET /signin
+    public function getIndex(Request $request, ResponseHandler $handler): ResponseHandler {
         try {
-            $model = $this->context->facade->session->getSigninModel();
+            foreach ($request->cookies as $cookie) {
+                $this->logWarning("Cookie", $cookie->__toString());
+            }
+        } catch (\Exception $ex) {
+        }
 
-            return $handler->smarty(
-                $this->getView("Session", "signin.tpl"),
-                $model
+        return $handler;
+    }
+
+    public function postIndex(Request $request, ResponseHandler $handler): ResponseHandler {
+        try {
+            $this->context->facade->session->signIn(
+                $request->body["username"],
+                $request->body["password"]
             );
-        } catch (\Throwable $err) {
-            return $this->context->handleError($err, $request);
+        } catch (\Exception $ex) {
+
+        } finally {
+            return $handler;
         }
     }
 
-    public function postIndex(Http\Request $request, Http\ResponseHandler $handler) {
-        $session = $this->context->facade->session->signin(
-            $request->body["username"],
-            $request->body["password"]
-        );
-
-        $res = array(
-            "body" => $request->body,
-            "query" => $request->query,
-            "session" => $session
-        );
-
-        return $handler->json($res);
-    }
-
-    public function getSignout(Http\Request $request, Http\ResponseHandler $handler) {
+    public function getSignout(Request $request, ResponseHandler $handler): ResponseHandler {
         throw new \Exception("Not Implemented");
     }
 

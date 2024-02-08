@@ -3,8 +3,8 @@
 namespace FLDSoftware\Jegyzet;
 
 use FLDSoftware\Config\ConfigBase;
-use FLDSoftware\Facade;
 use FLDSoftware\Http;
+use FLDSoftware\Jegyzet\Repository\JegyzetRepository;
 use FLDSoftware\WebApp;
 
 /**
@@ -18,18 +18,18 @@ class JegyzetWebApplication extends WebApp\WebApplicationBase {
     const PATHINFO_REGEX = "^\/(?:(?<controller>[\w+\-\_]+)([\/](?<action>[\w\-\_]+)?([\/](?<id>[\w+\-\_]+))*)*)$";
 
     /**
-     * Reference to the Facade instance that performs business logic.
-     * @var \FLDSoftware\Facade\FacadeBase
+     * Reference to the web application facade that implements the Repository
+     * pattern and contains methods that implement business logic of the
+     * application.
      */
-    public $facade;
+    public JegyzetRepository $facade;
 
     /**
      * Initialize the application.
      * @param \FLDSoftware\WebApp\Config\AppData $appData Application manifest data
      * @param \FLDSoftware\Config\ConfigBase $config Application configuration
-     * @param \FLDSoftware\Facade\FacadeBase $facade Application facade
      */
-    public function __construct(WebApp\Config\AppData $appData, ConfigBase $config, Facade\FacadeBase $facade) {
+    public function __construct(WebApp\Config\AppData $appData, ConfigBase $config, JegyzetRepository $facade) {
         parent::__construct($appData, $config);
 
         $this->facade = $facade;
@@ -38,7 +38,7 @@ class JegyzetWebApplication extends WebApp\WebApplicationBase {
     protected function setupControllers() {
         $this->mount(Controllers\RootController::class, $this);
         $this->mount(Controllers\SessionController::class, $this);
-        $this->mount(Controllers\NotebookController::class, $this);
+        //$this->mount(Controllers\NotebookController::class, $this);
         // TODO: add all controllers
     }
 
@@ -52,9 +52,12 @@ class JegyzetWebApplication extends WebApp\WebApplicationBase {
      * request body parsers, and add controllers with their URL configurations.
      */
     public function setup() {
+        // Shorthand for logger instance since it's used in many places
+        $logger = $this->getLogger();
+
         // Set request handler
         $this->requestHandler = new Http\RequestHandler();
-        $this->requestHandler->setLogger($this->logger);
+        $this->requestHandler->setLogger($logger);
 
         // Set request dispatcher
         $this->requestDispatcher = new WebApp\Http\RequestDispatcher(
@@ -67,13 +70,13 @@ class JegyzetWebApplication extends WebApp\WebApplicationBase {
         // Setup parsers
 
         $jsonBodyParser = new Http\Parsers\JsonBodyParser();
-        $jsonBodyParser->setLogger($this->logger);
+        $jsonBodyParser->setLogger($logger);
 
         $urlEncodedBodyParser = new Http\Parsers\UrlEncodedBodyParser();
-        $urlEncodedBodyParser->setLogger($this->logger);
+        $urlEncodedBodyParser->setLogger($logger);
 
         $cookieParser = new Http\Parsers\CookieParserBase();
-        $cookieParser->setLogger($this->logger);
+        $cookieParser->setLogger($logger);
 
         // Add body and cookie parsers for various payloads
         $this->requestHandler->addBodyParser($jsonBodyParser);
@@ -84,7 +87,7 @@ class JegyzetWebApplication extends WebApp\WebApplicationBase {
         $responseHandler = new WebApp\Http\SmartyResponseHandler(
             $this
         );
-        $responseHandler->setLogger($this->logger);
+        $responseHandler->setLogger($logger);
 
         $this->responseHandler = $responseHandler;
 

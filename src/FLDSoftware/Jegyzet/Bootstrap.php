@@ -4,10 +4,15 @@ namespace FLDSoftware\Jegyzet;
 
 use FLDSoftware\Config\ConfigBase;
 use FLDSoftware\Config\EnvironmentalConfigLoader;
-use FLDSoftware\Logging;
-use FLDSoftware\Http;
-use FLDSoftware\Pathlib;
-use FLDSoftware\Jegyzet\Components;
+use FLDSoftware\Jegyzet\Config\JegyzetAppConfig;
+use FLDSoftware\Jegyzet\Repository\JegyzetRepository;
+use FLDSoftware\Logging\ConsoleLogChannel;
+use FLDSoftware\Logging\LoggerBase;
+use FLDSoftware\Pathlib\Path;
+use FLDSoftware\Repository\RepositoryBase;
+use FLDSoftware\WebApp\Authentication\Authentication;
+use FLDSoftware\WebApp\Config\AppData;
+use FLDSoftware\WebApp\WebApplicationBase;
 
 /**
  * Bootstrap the application.
@@ -29,22 +34,22 @@ class Bootstrap {
      * Gets the base directory of the project.
      * @return \FLDSoftware\Pathlib\Path
      */
-    private static function _getBaseDir() {
-        return new Pathlib\Path(__DIR__, "..", "..", "..");
+    private static function _getBaseDir(): Path {
+        return new Path(__DIR__, "..", "..", "..");
     }
 
     /**
      * Gets the base directory of configuration files.
      * @return \FLDSoftware\Pathlib\Path
      */
-    private static function _getConfigDir() {
-        return new Pathlib\Path(self::_getBaseDir(), "conf");
+    private static function _getConfigDir(): Path {
+        return new Path(self::_getBaseDir(), "conf");
     }
 
     /**
      * Configure the runtime environment of the application.
      */
-    private static function setupRuntime() {
+    private static function setupRuntime(): void {
         \ini_set("error_reporting", \E_ALL);
         \ini_set("html_errors", "off");
     }
@@ -55,8 +60,8 @@ class Bootstrap {
      * application runs.
      * @return \FLDSoftware\WebApp\Config\AppData
      */
-    private static function setupAppData(string $environment) {
-        $res = \FLDSoftware\WebApp\Config\AppData::fromComposerFile(
+    private static function setupAppData(string $environment): AppData {
+        $res = AppData::fromComposerFile(
             self::_getBaseDir()
         );
 
@@ -71,7 +76,7 @@ class Bootstrap {
      * application runs.
      * @return \FLDSoftware\Jegyzet\Config\JegyzetAppConfig
      */
-    private static function setupConfig(string $environment) {
+    private static function setupConfig(string $environment): JegyzetAppConfig {
         $loader = new EnvironmentalConfigLoader(
             self::_getConfigDir(),
             Config\JegyzetAppConfig::class
@@ -87,25 +92,26 @@ class Bootstrap {
      * @param \FLDSoftware\Config\ConfigBase $config Application configuration
      * @return \FLDSoftware\Logging\LoggerBase
      */
-    private static function setupLogging(ConfigBase $config) {
-        $logger = new Logging\LoggerBase();
+    private static function setupLogging(ConfigBase $config): LoggerBase {
+        $logger = new LoggerBase();
 
         // Set logging levels
         $logger->setLevel(
-            Logging\LoggerBase::LOG_LEVEL_CRITICAL
-            | Logging\LoggerBase::LOG_LEVEL_ERROR
-            | Logging\LoggerBase::LOG_LEVEL_WARNING
-            | Logging\LoggerBase::LOG_LEVEL_MAJOR
-            | Logging\LoggerBase::LOG_LEVEL_MINOR
+            LoggerBase::LOG_LEVEL_CRITICAL
+            | LoggerBase::LOG_LEVEL_ERROR
+            | LoggerBase::LOG_LEVEL_WARNING
+            | LoggerBase::LOG_LEVEL_MAJOR
+            | LoggerBase::LOG_LEVEL_MINOR
+            | LoggerBase::LOG_LEVEL_INFO
         );
 
         if ($config->getValue("debug")) {
-            $logger->setLevel(Logging\LoggerBase::LOG_LEVEL_DEBUG);
+            $logger->setLevel(LoggerBase::LOG_LEVEL_DEBUG);
         }
 
         // Add logging channels
         $logger->addChannel(
-            new Logging\ConsoleLogChannel()
+            new ConsoleLogChannel()
         );
 
         return $logger;
@@ -114,17 +120,18 @@ class Bootstrap {
     /**
      * Initialize the application facade.
      * @param \FLDSoftware\Config\ConfigBase $config
-     * @return \FLDSoftware\Jegyzet\Facade
+     * @param \FLDSoftware\Logging\LoggerBase $logger
+     * @return \FLDSoftware\Repository\RepositoryBase
      */
-    private static function setupFacade(ConfigBase $config) {
-        $facade = new Facade($config);
-
-        // TODO: register all facade components
-        $facade->register("session", Components\SessionComponent::class);
-
-        $facade->register("email", Components\EmailComponent::class);
+    private static function setupFacade(ConfigBase $config, LoggerBase $logger): RepositoryBase {
+        $facade = JegyzetRepository::setup($config, $logger);
 
         return $facade;
+    }
+
+    // FIXME
+    private static function setupAuthentication(ConfigBase $config, LoggerBase $logger): Authentication {
+        return new Authentication();
     }
 
     /**
@@ -132,19 +139,23 @@ class Bootstrap {
      * @param string $environment Environment name.
      * @return \FLDSoftware\WebApp\WebApplicationBase Web application instance.
      */
-    public static function setup(string $environment) {
+    public static function setup(string $environment): WebApplicationBase {
         self::setupRuntime();
 
         $appData = self::setupAppData($environment);
         $config = self::setupConfig($environment);
         $logger = self::setupLogging($config);
-        $facade = self::setupFacade($config);
+
+        $facade = self::setupFacade($config, $logger);
 
         $app = new JegyzetWebApplication(
             $appData,
             $config,
             $facade
         );
+
+        // Set authentication strategies
+        $app->setDefaultAuthStrategy(null);
 
         // Set logger
         $app->setLogger($logger);

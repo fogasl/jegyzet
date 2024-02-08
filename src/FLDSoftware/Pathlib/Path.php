@@ -2,6 +2,9 @@
 
 namespace FLDSoftware\Pathlib;
 
+/**
+ * Path manipulation library.
+ */
 class Path {
 
     const FORBIDDEN_CHARS_LINUX = array("/");
@@ -55,6 +58,7 @@ class Path {
 
     /**
      * Returns canonicalized absolute pathname for non-existent paths.
+     * Thanks for Sven Arduwie!
      * @param string $path
      * @return string
      * @see https://www.php.net/manual/en/function.realpath.php#84012
@@ -139,12 +143,12 @@ class Path {
         } else {
             $res = self::realpath($this->__toString());
         }
-        
+
         return $res;
     }
 
     public function cd($dir) {
-
+        throw new \Exception("Not Implemented");
     }
 
 }

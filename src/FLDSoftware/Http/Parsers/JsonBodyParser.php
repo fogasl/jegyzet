@@ -3,13 +3,15 @@
 namespace FLDSoftware\Http\Parsers;
 
 use FLDSoftware\Http;
-use FLDSoftware\Logging\LoggerBase;
 
 /**
  * HTTP request body parser for JSON payloads.
  */
 class JsonBodyParser extends BodyParserBase {
 
+    /**
+     * List of supported content types.
+     */
     const CONTENT_TYPES = array(
         "application/json"
     );

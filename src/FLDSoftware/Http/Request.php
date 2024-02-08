@@ -10,75 +10,75 @@ class Request {
     /**
      * Server name to which the request was issued.
      */
-    public $serverName;
+    public string $serverName;
 
     /**
      * Server port number to which the request was issued.
      */
-    public $serverPort;
+    public string $serverPort;
 
     /**
      * Address of the remote peer who made the request.
      */
-    public $address;
+    public string $address;
 
     /**
      * Port number of the remote peer who made the request.
      */
-    public $port;
+    public int $port;
 
     /**
      * HTTP protocol of the request.
      */
-    public $protocol;
+    public string $protocol;
 
     /**
      * URI of the requested resource the contains the query string.
      */
-    public $uri;
+    public string $uri;
 
     /**
      * URI of the requested resource without the query string.
      */
-    public $path;
+    public string $path;
 
     /**
      * HTTP method of the request.
      */
-    public $method;
+    public string $method;
 
     /**
      * Client-provided path information (if any) between the requested
      * script filename and the query string (e.g. index.php/foo/bar/baz)
      */
-    public $pathInfo;
+    public string $pathInfo;
 
     /**
      * Parsed request headers.
      */
-    public $headers;
+    public HeaderContainer $headers;
 
     /**
      * Parsed query string.
      */
-    public $query;
+    public array $query;
 
     /**
      * Parsed request body (payload).
      */
-    public $body;
+    public array $body;
 
     /**
      * Parsed cookies attached to the request.
      * @var \FLDSoftware\Http\CookieContainer
      */
-    public $cookies;
+    public CookieContainer $cookies;
 
     /**
      * Preliminary response object.
      * @var \FLDSoftware\Http\Response
      */
-    public $response;
+    public Response $response;
 
     /**
      * Initialize a new instance of the Request class with empty fields.
@@ -86,6 +86,7 @@ class Request {
     public function __construct() {
         $this->headers = new HeaderContainer();
         $this->cookies = new CookieContainer();
+        $this->response = new Response();
     }
 
     /**

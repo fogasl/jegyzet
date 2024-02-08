@@ -5,12 +5,14 @@ namespace FLDSoftware\Config;
 /**
  * Base class for parsed configuration files.
  */
-class ConfigBase {
+class ConfigBase implements \IteratorAggregate {
 
     /**
+     * Array that contains read configuration and default config values
+     * merged in a single array.
      * @var array
      */
-    protected $_config;
+    protected array $_config = array();
 
     /**
      * Initialize a new instance of the `ConfigBase` class.
@@ -20,6 +22,10 @@ class ConfigBase {
     public function __construct(array $config = array(), array $defaultConfig = array()) {
         // Merge arrays with overwrite behaviour
         $this->_config = \array_replace_recursive($defaultConfig, $config);
+    }
+
+    public function getIterator(): \Traversable {
+        return new \ArrayIterator($this->_config);
     }
 
     /**

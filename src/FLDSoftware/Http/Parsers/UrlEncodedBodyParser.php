@@ -3,7 +3,6 @@
 namespace FLDSoftware\Http\Parsers;
 
 use FLDSoftware\Http;
-use FLDSoftware\Logging\LoggerBase;
 
 /**
  * HTTP request body parser for URL-encoded input (default of HTML forms).

@@ -33,15 +33,6 @@ class RootController extends JegyzetControllerBase {
         );
     }
 
-    public function middlewares() {
-        return array(
-            "getIndex" => array(
-                "before" => array(),
-                "after" => array()
-            )
-        );
-    }
-
     /**
      * HTTP endpoint handler for GET /
      * @param \FLDSoftware\Http\Request $request
@@ -71,7 +62,7 @@ class RootController extends JegyzetControllerBase {
             $this->getView("Main", "index.tpl"),
             array(
                 "appName" => $this->context->appData->name,
-                "now" => (new \DateTime())->format("Y-m-d")
+                "now" => (new \DateTimeImmutable())->format("Y-m-d")
             )
         );
     }

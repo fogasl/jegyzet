@@ -53,7 +53,7 @@ class RequestDispatcher extends Loggable {
     protected $flags;
 
     // FIXME: Return path component from the request
-    protected function findEndpoint(Request $request) {
+    protected function findEndpoint(Http\Request $request) {
         return $this->context->urlMap;
     }
 
@@ -67,9 +67,11 @@ class RequestDispatcher extends Loggable {
         $this->flags = $flags;
     }
 
+    // FIXME WebApplicationBase.php:142
+
     /**
      * Dispatch request to the appropriate controller method.
-     * 
+     *
      * In the basic RequestDispatcher, the dispatch process is the following:
      * 1. Find controller and method name in the urlMap of the context (that
      * is itself a reference to the enclosing web application instance)
@@ -79,10 +81,10 @@ class RequestDispatcher extends Loggable {
      * in which they can manipulate the `response` field.
      * 4. Return the response handler instance to the calling
      * {@see \FLDSoftware\WebApp\WebApplicationBase::handleRequest}.
-     * 
+     *
      * @param \FLDSoftware\Http\Request $request HTTP request
      * @return \FLDSoftware\Http\ResponseHandler Response handler instance.
-     * 
+     *
      * @throws \Exception Cannot find controller method for the given request
      * @throws \Exception Controller method does not return a
      * {@see \FLDSoftware\Http\ResponseHandler} instance.
@@ -109,7 +111,7 @@ class RequestDispatcher extends Loggable {
         }
 
         // Find handler in the urlMap
-        // FIXME: implement case-insensitive path search
+        // FIXME: implement case-insensitive path search (using RegExp)
         if (!(\array_key_exists($request->method, $this->context->urlMap)) ||
             !(\array_key_exists($path, $this->context->urlMap[$request->method]))) {
             throw new WebApp\Errors\RouteNotFoundException(
@@ -138,6 +140,8 @@ class RequestDispatcher extends Loggable {
         }
 
         // Here comes the magic
+        // FIXME create method for calling controller function; implement
+        // authentication validation and request/response validation
         $response = \call_user_func_array(
             array($controller, $method),
             array($request, $this->context->responseHandler)

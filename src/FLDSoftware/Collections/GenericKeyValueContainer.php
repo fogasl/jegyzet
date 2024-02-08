@@ -7,7 +7,11 @@ namespace FLDSoftware\Collections;
  * Type of the accepted values can be defined.
  * Keys are strings.
  */
-class GenericKeyValueContainer {
+class GenericKeyValueContainer implements \IteratorAggregate {
+
+    public function getIterator(): \Traversable {
+        return new \ArrayIterator($this->_items);
+    }
 
     /**
      * Type of the values to contain.

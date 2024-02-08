@@ -23,7 +23,7 @@ class ConfigLoader {
 
     /**
      * Parse the configuration file contents (associative array) to the class
-     * spacified.
+     * specified.
      * Subclasses may override this method to implement their own class
      * initializer mechanisms.
      * @param array $config

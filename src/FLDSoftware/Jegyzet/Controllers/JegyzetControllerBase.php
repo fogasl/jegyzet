@@ -20,14 +20,14 @@ abstract class JegyzetControllerBase extends ControllerBase {
     }
 
     /**
-     * Gets the views root directory path.
+     * Gets the template root directory path.
      * @return \FLDSoftware\Pathlib\Path
      */
-    protected function getViewsDir() {
+    protected function getTemplatesDir() {
         return new Path(
             __DIR__,
             "..",
-            "Views"
+            "Templates"
         );
     }
 
@@ -40,7 +40,7 @@ abstract class JegyzetControllerBase extends ControllerBase {
      */
     protected function getView(string $component, string $file) {
         return new Path(
-            $this->getViewsDir(),
+            $this->getTemplatesDir(),
             $component,
             $file
         );
